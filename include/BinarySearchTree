@@ -1,168 +1,173 @@
+#ifndef BINARYSEARCHTREE_BINARYSEARCHTREE_H
+#define BINARYSEARCHTREE_BINARYSEARCHTREE_H
+#pragma once
+// BinarySearchTree.cpp: определяет точку входа для консольного приложения.
+//Реализовать класс "", имеющий интерфейс:
+//вставка элемента в дерево
+//поиск элемента в дереве
+//файловый потоковый ввод/вывод
+//потоковый вывод
+
 #include <initializer_list>
 #include <iostream>
 #include <fstream>
-
-template <typename T>
+template<typename T>
 class BinarySearchTree;
 
-template <typename T>
-std::ofstream& operator << (std::ofstream& fout, const BinarySearchTree<T>& tree);
-template <typename T>
-std::ostream& operator << (std::ostream& out, const BinarySearchTree<T>& tree);
-template <typename T>
-std::istream& operator >> (std::istream& in, BinarySearchTree<T>& tree);
 
 template <typename T>
-class BinarySearchTree
+std::ofstream & operator << (std::ofstream & out, const BinarySearchTree<T> & tree)
 {
-    class Node
-    {
-    public:
-        T value;
-        Node* right;
-        Node* left;
-        Node(T val):value(val), right(nullptr) left(nullptr) {}
-        ~Node()
-        {
-            delete right;
-            delete left;
-            left = right = nullptr;
-        }
-    };
-    Node* Child;
-    size_t size;
-
-public:
-    BinarySearchTree() : Child(nullptr), size(0) {};
-    BinarySearchTree(BinarySearchTree<T>&& tree);
-    BinarySearchTree(const std::initializer_list<T>& list);
-    bool add(T& val) noexcept;
-    const T* getTree(const T& val) const noexcept;
-    void inorder_walk(std::ostream& out, Node* child) const noexcept;
-    Node* ReturnChild() const noexcept {return Child;}
-    BinarySearchTree<T>& operator= (BinarySearchTree<T>&& tree);
-    ~BinarySearchTree();
+    tree.DoPreorderWalk(out, tree.GetRoot());
+    return out;
 };
 
 template <typename T>
-std::ostream& operator << (std::ostream& out, const BinarySearchTree<T>& tree)
+std::ostream & operator << (std::ostream & out, const BinarySearchTree<T> & tree)
 {
-	tree.inorder_walk(out, tree.ReturnChild());
-	return out;
-}
+    tree.DoPreorderWalk(out, tree.GetRoot());
+    return out;
+};
 
 template <typename T>
-std::ofstream& operator << (std::ofstream& fout, const BinarySearchTree<T>& tree)
+std::istream & operator >> (std::istream & in, BinarySearchTree<T> & tree)
 {
-	tree.inorder_walk(fout, tree.ReturnChild());
-	return fout;
-}
-
-template <typename T>
-std::istream& operator >> (std::istream& in, BinarySearchTree<T>& tree)
-{
-	setlocale(LC_ALL, "Russian");
-	size_t size = 0;
-	cout << "Введите колличество: ";
-	cin >> size;
-	cout << '\n';
-	for (size_t i = 0; i < size; i++)
-	{
-		T value;
-		in >> value;
-		tree.add(value);
-		cout << ' ';
-	}
-	return in;
-}
-
-template <typename T>
-BinarySearchTree<T>::BinarySearchTree(const std::initializer_list<T>& list):size(0), Child(nullptr)
-{
-    for (auto it : list)
-	{
-        add(it);
+    T value;
+    int size;
+    std::cout << "Size: ";
+    if (in >> size) {
+        for (int i = 0; i < size; i++)
+        {
+            if (in >> value) {
+                tree.insert(value);
+            }
+        }
     }
-}
+    return in;
+};
 
-template <typename T>
-BinarySearchTree<T>::BinarySearchTree(BinarySearchTree<T>&& tree):size(tree.size), Child(tree.Child)
+template<typename T>
+class BinarySearchTree
 {
-    tree.Child = nullptr;
-}
+private:
+    struct Node {
+        Node * left_; //указатель на левого сына
+        Node * right_; //указатель на правого сына
+        T value_; //значение
 
-template <typename T>
-bool BinarySearchTree<T>::add(T& val) noexcept //Фукция добавления звена в дерево
-{
-    if (!size) 
-	{
-		Child = new Node(val);
-        size++;
-        return true;
-    }
-    Node* Q_Link = Child;
-    Node* P_Link = Child;
-    while (Q_Link)
+        Node(T value) : value_(value), left_(nullptr), right_(nullptr) {}; //конструктор, инициализирующий узел
+        ~Node()
+        {
+            delete left_;
+            delete right_;
+        }
+    };
+
+    Node* root_; //указатель на корень
+    size_t size_; //размер дерева
+
+public:
+    BinarySearchTree()
     {
-		P_Link = Q_Link;
-        if (Q_Link->value > val)
-			Q_Link = Q_Link->left;
-        else if (Q_Link->value < val)
-			Q_Link = Q_Link->right;
-        else if (Q_Link->value == val)
-            return false;
+        size_ = 0;
+        root_ = nullptr;
+    };
+    BinarySearchTree(const std::initializer_list<T> & list)
+    {
+        size_ = 0;
+        root_ = nullptr;
+        for (auto it = list.begin(); it != list.end(); ++it)
+        {
+            insert(*it);
+        };
+
+    };
+    void DoPreorderWalk(std::ostream & str, Node *this_node) const noexcept //Прямой обход дерева
+    {
+        if (!this_node) { return; }
+        str << this_node->value_ << " ";
+        DoPreorderWalk(str, this_node->left_);
+        DoPreorderWalk(str, this_node->right_);
     }
-    if (P_Link->value > val)
-		P_Link->left = new Node(val);
-    else
-		P_Link->right = new Node(val);
-    size++;
-    return true;
-}
-
-template <typename T>
-const T* BinarySearchTree<T>::getTree(const T& val) const noexcept
-{
-    const Node* tmp = Child;
-    while (tmp) 
-	{
-        if (tmp->value > val)
-            tmp = tmp->left;
-        else if (tmp->value < val)
-            tmp = tmp->right;
-        else return &tmp->value;
+    Node* GetRoot() const
+    {
+        return root_;
     }
-    return nullptr;
-}
+    ~BinarySearchTree()
+    {
+        delete root_;
+    };
 
-template <typename T>
-BinarySearchTree<T>& BinarySearchTree<T>::operator= (BinarySearchTree<T>&& tree)
-{
-    if (this == &tree)
-        return *this;
 
-    delete Child;
-    size = tree.size;
-	Child = tree.Child;
-    tree.Child = nullptr;
+    auto size() noexcept -> size_t
+    {
+        return size_;
+    };
 
-    return *this;
-}
 
-template <typename T>
-BinarySearchTree<T>::~BinarySearchTree()
-{
-    delete Child;
-    Child = nullptr;
-    size = 0;
-}
+    auto insert(const T & value) noexcept -> bool
+    {
 
-template <typename T>
-void BinarySearchTree<T>::inorder_walk(std::ostream& out, Node* child) const noexcept
-{
-    if (!child) return;
+        Node* this_node = root_;
+        Node* my_node = nullptr;
+        if (root_ == nullptr)
+        {
+            root_ = new Node(value);
+            size_++;
+            return true;
+        }
+        while (this_node)
+        {
+            my_node = this_node;
+            if (value == my_node->value_)
+            {
+                return false;
+            }
+            else if (value < my_node->value_)
+            {
+                this_node = my_node->left_;
+            }
+            else if (value > my_node->value_)
+            {
+                this_node = my_node->right_;
+            }
+        }
+        if (value < my_node->value_)
+        {
+            my_node->left_ = new Node(value);
+        }
+        else
+        {
+            my_node->right_ = new Node(value);
+        };
+        size_++;
+        return true;
+    };
 
-    out << child->value << ' ';
-    inorder_walke(out, child->left);
-    inorder_walk(out, child->right);
-}
+    auto find(const T & value) const noexcept -> const T *
+    {
+        Node *this_node = root_;
+        if (size_== 0)
+        {
+            return nullptr;
+        };
+        while (this_node)
+        {
+            if (value < this_node->value_)
+            {
+                this_node = this_node->left_;
+            }
+            else if (value > this_node->value_)
+            {
+                this_node = this_node->right_;
+            }
+            else if (value == this_node->value_)
+            {
+                return &this_node->value_;
+            }
+        }
+        return nullptr;
+    };
+};
+
+#endif //BINARYSEARCHTREE_BINARYSEARCHTREE_H
