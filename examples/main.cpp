@@ -1,4 +1,4 @@
-#include "BinarySearchTree.h"
+#include "/../include/BinarySearchTree.h"
 int main()
 {
 	BinarySearchTree<int> tree= { 8,10,3,6,7,14,13 }; 
