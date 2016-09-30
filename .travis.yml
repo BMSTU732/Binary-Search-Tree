@@ -6,7 +6,7 @@ addons:
     packages:
       - cmake
 script:
-  - mkdir build
+  - mkdir build 
   - cd build
   - cmake .. && make
-  - tests -s-r compact
+  - tests -s -r compact
