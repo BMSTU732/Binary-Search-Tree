@@ -25,4 +25,9 @@ int main()
     file2 >> tree2;
     tree2 = std::move(tree);
     std::cout << tree2 << std::endl;
+     BinarySearchTree<int> tree4 = { 6,3,8,7,2,9};
+	if (tree4.remove(3) == true)
+	{
+		std::cout << "После удаления элемента: " << tree4 << std::endl;
+	}
 }
