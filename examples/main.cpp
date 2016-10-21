@@ -1,33 +1,32 @@
 #include "../include/BinarySearchTree.h"
-int main()
-{
-    setlocale(LC_ALL,"Russian");
-    BinarySearchTree<int> tree= { 8,10,3,6,7,14,13 };
-    tree.insert(5);
-    tree.find(10);
 
-    BinarySearchTree<int> tree3;
-    std::cin >> tree3;
-    std::ofstream file1("C:\\tree.txt");
-    file1 << tree;
-    tree = tree3;
-    std::cout << tree<<std::endl;
 
-    auto a = tree.find(1);
-    std::cout << (*a) << std:: endl;
-    if (tree == tree3)
-    {
-        std::cout << "Деревья равны!" << std::endl;
-    }
-    else { std::cout << "Деревья не равны!" << std::endl; }
-    BinarySearchTree<int> tree2 = {1,2,3,4,5,6};
-    std::ifstream file2("C:\\tree2.txt");
-    file2 >> tree2;
-    tree2 = std::move(tree);
-    std::cout << tree2 << std::endl;
-     BinarySearchTree<int> tree4 = { 6,3,8,7,2,9};
-	if (tree4.remove(3) == true)
-	{
-		std::cout << "После удаления элемента: " << tree4 << std::endl;
-	}
+int main() {
+	BinarySearchTree<int> Tree{ 11, 12, 15, 9 };
+	auto a = 8;
+	Tree.Insert(a);
+
+	std::ofstream file("C:/Users/Роман/Desktop/BinarySearchTree.txt");
+
+	file << Tree;
+	file.close();
+
+	std::cin >> Tree;
+	std::cout << Tree << std::endl;
+
+	std::ifstream file2("C:/Users/Роман/Desktop/BinarySearchTree.txt");
+	BinarySearchTree<int> Tree2;
+	file2 >> Tree2;
+	std::cout << Tree2 << std::endl;
+
+	BinarySearchTree<int> Tree3(std::move(Tree));
+	std::cout << Tree3 << std::endl;
+
+	Tree = Tree3;
+	std::cout << Tree << std::endl;
+	
+	std::cout << (Tree == Tree2) << std::endl;
+
+	system("pause");
+	return 0;
 }
