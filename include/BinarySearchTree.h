@@ -1,5 +1,4 @@
-#ifndef BINARYSEARCHTREE_BINARYSEARCHTREE_H
-#define BINARYSEARCHTREE_BINARYSEARCHTREE_H
+#pragma once
 
 #include <initializer_list>
 #include <iostream>
@@ -308,5 +307,3 @@ public:
 	};
 	
 };
-
-#endif //BINARYSEARCHTREE_BINARYSEARCHTREE_H
